@@ -11,6 +11,7 @@ import {
 import { PASSWORD_RESET_LINK } from "#/utils/variables";
 import { Request, Response } from "express";
 import { isValidObjectId } from "mongoose";
+import jwt from "jsonwebtoken";
 
 export async function signup(req: CreateUserRequest, res: Response) {
   const { email, password, name } = req.body;
@@ -122,4 +123,39 @@ export async function resetPassword(req: Request, res: Response) {
   sendPasswordResetSuccessEmail(user.email);
 
   res.status(200).json({ message: "Password reset successfully" });
+}
+
+export async function signIn(req: Request, res: Response) {
+  const { email, password } = req.body;
+
+  const user = await User.findOne({ email });
+  if (!user) return res.status(403).json({ error: "Invalid Credentials" });
+
+  const isSamePassword = await user.comparePassword(password);
+  if (!isSamePassword)
+    return res.status(403).json({ error: "Invalid Credentials" });
+
+  const token = jwt.sign(
+    {
+      id: user._id,
+    },
+    process.env.JWT_SECRET as string
+  );
+
+  user.tokens.push(token);
+
+  await user.save();
+
+  res.status(200).json({
+    user: {
+      id: user._id,
+      name: user.name,
+      email,
+      verified: user.verified,
+      avatar: user.avatar?.url,
+      followers: user.followers.length,
+      followings: user.followings.length,
+    },
+    token,
+  });
 }

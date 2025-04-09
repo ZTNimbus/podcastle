@@ -3,14 +3,16 @@ import {
   grandValid,
   resetPassword,
   sendVerificationToken,
+  signIn,
   signup,
   verifyEmail,
 } from "#/controllers/user";
-import { isValidPasswordResetToken } from "#/middleware/auth";
+import { isAuth, isValidPasswordResetToken } from "#/middleware/auth";
 import { validate } from "#/middleware/validator";
 import {
   CreateUserSchema,
   ResetPasswordSchema,
+  SignInValidationSchema,
   TokenAndIdVerification,
 } from "#/utils/validationSchema";
 import express, { Application, RequestHandler } from "express";
@@ -49,6 +51,16 @@ validate(ResetPasswordSchema).then((validationMiddleware) => {
     isValidPasswordResetToken as RequestHandler,
     resetPassword as RequestHandler
   );
+});
+
+validate(SignInValidationSchema).then((validationMiddleware) => {
+  router.post("/sign-in", validationMiddleware, signIn as RequestHandler);
+});
+
+router.get("/is-auth", isAuth as RequestHandler, async (req, res) => {
+  res.status(200).json({
+    user: req.user,
+  });
 });
 
 export default router;
