@@ -1,6 +1,6 @@
 interface Options {
   message: string;
-  token: string;
+  btnMessage: string;
   headline: string;
   logo: string;
   link: string;
@@ -9,7 +9,7 @@ export const generateTemplate = ({
   message,
   logo,
   headline,
-  token,
+  btnMessage,
   link,
 }: Options) => `<!DOCTYPE html>
 <html xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office" lang="en">
@@ -244,7 +244,7 @@ export const generateTemplate = ({
 <w:anchorlock/>
 <v:textbox inset="0px,0px,0px,0px">
 <center dir="false" style="color:#ffffff;font-family:sans-serif;font-size:16px">
-<![endif]--><span class="button" style="background-color: #03191e; border-bottom: 1px solid #03191E; border-left: 1px solid #03191E; border-radius: 4px; border-right: 1px solid #03191E; border-top: 1px solid #03191E; color: #ffffff; display: inline-block; font-family: Arial, Helvetica Neue, Helvetica, sans-serif; font-size: 16px; font-weight: undefined; mso-border-alt: none; padding-bottom: 5px; padding-top: 5px; padding-left: 20px; padding-right: 20px; text-align: center; width: auto; word-break: keep-all; letter-spacing: normal;"><span style="word-break: break-word; line-height: 32px;">${token}</span></span><!--[if mso]></center></v:textbox></v:roundrect><![endif]--></a></div>
+<![endif]--><span class="button" style="background-color: #03191e; border-bottom: 1px solid #03191E; border-left: 1px solid #03191E; border-radius: 4px; border-right: 1px solid #03191E; border-top: 1px solid #03191E; color: #ffffff; display: inline-block; font-family: Arial, Helvetica Neue, Helvetica, sans-serif; font-size: 16px; font-weight: undefined; mso-border-alt: none; padding-bottom: 5px; padding-top: 5px; padding-left: 20px; padding-right: 20px; text-align: center; width: auto; word-break: keep-all; letter-spacing: normal;"><span style="word-break: break-word; line-height: 32px;">${btnMessage}</span></span><!--[if mso]></center></v:textbox></v:roundrect><![endif]--></a></div>
 															</td>
 														</tr>
 													</table>
