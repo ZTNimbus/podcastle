@@ -1,13 +1,17 @@
 import {
   generateForgotPasswordLink,
   grandValid,
+  logout,
   resetPassword,
+  sendProfile,
   sendVerificationToken,
   signIn,
   signup,
+  updateProfile,
   verifyEmail,
-} from "#/controllers/user";
+} from "#/controllers/auth";
 import { isAuth, isValidPasswordResetToken } from "#/middleware/auth";
+import fileParser from "#/middleware/fileParser";
 import { validate } from "#/middleware/validator";
 import {
   CreateUserSchema,
@@ -57,10 +61,15 @@ validate(SignInValidationSchema).then((validationMiddleware) => {
   router.post("/sign-in", validationMiddleware, signIn as RequestHandler);
 });
 
-router.get("/is-auth", isAuth as RequestHandler, async (req, res) => {
-  res.status(200).json({
-    user: req.user,
-  });
-});
+router.get("/is-auth", isAuth as RequestHandler, sendProfile);
+
+router.patch(
+  "/update-profile",
+  isAuth as RequestHandler,
+  fileParser as Application,
+  updateProfile
+);
+
+router.post("/logout", isAuth as RequestHandler, logout as RequestHandler);
 
 export default router;

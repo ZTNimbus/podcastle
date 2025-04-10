@@ -1,5 +1,6 @@
 import passwordResetToken from "#/models/passwordResetToken";
 import User from "#/models/users";
+import { formatProfile } from "#/utils/helper";
 import { JWT_SECRET } from "#/utils/variables";
 import { NextFunction, Request, Response } from "express";
 import { JwtPayload, verify } from "jsonwebtoken";
@@ -34,15 +35,20 @@ export async function isAuth(req: Request, res: Response, next: NextFunction) {
   const user = await User.findOne({ _id: id, tokens: token });
   if (!user) return res.status(403).json({ error: "Unauthorized" });
 
-  req.user = {
-    id: user._id,
-    name: user.name,
-    email: user.email,
-    verified: user.verified,
-    avatar: user.avatar?.url,
-    followers: user.followers.length,
-    followings: user.followings.length,
-  };
+  req.user = formatProfile(user);
+
+  req.token = token;
+
+  next();
+}
+
+export async function isVerified(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  if (!req.user.verified)
+    return res.status(403).json({ error: "User not verified" });
 
   next();
 }

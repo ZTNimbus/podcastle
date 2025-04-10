@@ -2,7 +2,7 @@ import { CreateUserRequest, VerifyEmailRequest } from "#/@types/user";
 import emailVerificationToken from "#/models/emailVerificationToken";
 import PasswordResetToken from "#/models/passwordResetToken";
 import User from "#/models/users";
-import { generateToken } from "#/utils/helper";
+import { formatProfile, generateToken } from "#/utils/helper";
 import {
   sendForgotPasswordLink,
   sendPasswordResetSuccessEmail,
@@ -12,6 +12,9 @@ import { PASSWORD_RESET_LINK } from "#/utils/variables";
 import { Request, Response } from "express";
 import { isValidObjectId } from "mongoose";
 import jwt from "jsonwebtoken";
+import { RequestWithFiles } from "#/middleware/fileParser";
+import cloudinary from "#/cloud";
+import formidable from "formidable";
 
 export async function signup(req: CreateUserRequest, res: Response) {
   const { email, password, name } = req.body;
@@ -147,15 +150,64 @@ export async function signIn(req: Request, res: Response) {
   await user.save();
 
   res.status(200).json({
-    user: {
-      id: user._id,
-      name: user.name,
-      email,
-      verified: user.verified,
-      avatar: user.avatar?.url,
-      followers: user.followers.length,
-      followings: user.followings.length,
-    },
+    user: formatProfile(user),
     token,
   });
+}
+
+export async function sendProfile(req: Request, res: Response) {
+  res.status(200).json({ user: req.user });
+}
+
+export async function updateProfile(req: RequestWithFiles, res: Response) {
+  const { name } = req.body;
+  const avatar = req.files?.avatar as formidable.File;
+
+  const user = await User.findById(req.user?.id);
+  if (!user) throw new Error("Something went wrong, user not found");
+
+  if (typeof name !== "string") res.status(422).json({ error: "Invalid name" });
+  if (name.trim().length < 2 || name.trim().length > 50)
+    res.status(422).json({ error: "Invalid name" });
+
+  user.name = name;
+
+  if (avatar) {
+    if (user.avatar?.publicId)
+      await cloudinary.uploader.destroy(user.avatar.publicId);
+
+    const { secure_url, public_id } = await cloudinary.uploader.upload(
+      avatar.filepath,
+      {
+        width: 300,
+        height: 300,
+        crop: "thumb",
+        gravity: "face",
+      }
+    );
+
+    user.avatar = { url: secure_url, publicId: public_id };
+  }
+
+  await user.save();
+
+  res.status(200).json({
+    user: formatProfile(user),
+  });
+}
+
+export async function logout(req: Request, res: Response) {
+  const { fromAll } = req.query;
+
+  const token = req.token;
+
+  const user = await User.findById(req.user.id);
+  if (!user) throw new Error("Something went wrong, user not found");
+
+  if (fromAll === "yes") user.tokens = [];
+  else user.tokens = user.tokens.filter((t) => t !== token);
+
+  await user.save();
+
+  res.status(200).json({ message: "Logout successfully" });
 }

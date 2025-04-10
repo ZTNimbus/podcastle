@@ -4,3 +4,6 @@ export const MAILTRAP_TOKEN = process.env.MAILTRAP_TOKEN as string;
 export const PASSWORD_RESET_LINK = process.env.PASSWORD_RESET_LINK as string;
 export const SIGN_IN_URL = process.env.SIGN_IN_URL as string;
 export const JWT_SECRET = process.env.JWT_SECRET as string;
+export const CLOUD_NAME = process.env.CLOUD_NAME as string;
+export const CLOUD_KEY = process.env.CLOUD_KEY as string;
+export const CLOUD_SECRET = process.env.CLOUD_SECRET as string;
