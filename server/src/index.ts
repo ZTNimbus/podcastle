@@ -5,6 +5,7 @@ import authRouter from "./routers/auth";
 import audioRouter from "./routers/audio";
 import favoriteRouter from "./routers/favorite";
 import playlistRouter from "./routers/playlist";
+import profileRouter from "./routers/profile";
 import { PORT } from "./utils/variables";
 
 const app = express();
@@ -17,5 +18,6 @@ app.use("/api/auth", authRouter);
 app.use("/api/audio", audioRouter);
 app.use("/api/favorite", favoriteRouter);
 app.use("/api/playlist", playlistRouter);
+app.use("/api/profile", profileRouter);
 
 app.listen(PORT, () => console.log("Server listening on port", PORT));

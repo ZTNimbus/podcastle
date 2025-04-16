@@ -15,6 +15,7 @@ export interface UserDocument {
   favorites: ObjectId[];
   followers: ObjectId[];
   followings: ObjectId[];
+  createdAt: Date;
 }
 
 interface Methods {
