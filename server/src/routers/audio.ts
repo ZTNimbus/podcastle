@@ -1,4 +1,8 @@
-import { createAudio, updateAudio } from "#/controllers/audio";
+import {
+  createAudio,
+  getLatestUploads,
+  updateAudio,
+} from "#/controllers/audio";
 import { isAuth, isVerified } from "#/middleware/auth";
 import fileParser from "#/middleware/fileParser";
 import { validate } from "#/middleware/validator";
@@ -28,5 +32,7 @@ validate(AudioValidationSchema).then((validationMiddleware) => {
     updateAudio as RequestHandler
   );
 });
+
+router.get("/latest", getLatestUploads as RequestHandler);
 
 export default router;

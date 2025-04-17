@@ -2,10 +2,11 @@ import {
   getPublicPlaylists,
   getPublicProfile,
   getPublicUploads,
+  getRecommendedByProfile,
   getUploadedAudios,
   updateFollower,
 } from "#/controllers/profile";
-import { isAuth } from "#/middleware/auth";
+import { isAuth, isAuthSoft } from "#/middleware/auth";
 import { RequestHandler, Router } from "express";
 
 const router = Router();
@@ -28,5 +29,11 @@ router.get("/uploads/:profileId", getPublicUploads as RequestHandler);
 router.get("/info/:profileId", getPublicProfile as RequestHandler);
 
 router.get("/playlists/:profileId", getPublicPlaylists as RequestHandler);
+
+router.get(
+  "/recommended",
+  isAuthSoft as RequestHandler,
+  getRecommendedByProfile as RequestHandler
+);
 
 export default router;

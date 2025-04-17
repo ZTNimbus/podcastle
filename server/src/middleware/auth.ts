@@ -52,3 +52,29 @@ export async function isVerified(
 
   next();
 }
+
+//Does not throw error like isAuth middleware
+//Register user and token is token exists, no action if no token, finally next() regardless of token
+export async function isAuthSoft(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  const { authorization } = req.headers;
+
+  const token = authorization?.split("Bearer ")[1];
+
+  if (token) {
+    const payload = verify(token, JWT_SECRET) as JwtPayload;
+    const id = payload.id;
+
+    const user = await User.findOne({ _id: id, tokens: token });
+    if (!user) return res.status(403).json({ error: "Unauthorized" });
+
+    req.user = formatProfile(user);
+
+    req.token = token;
+  }
+
+  next();
+}

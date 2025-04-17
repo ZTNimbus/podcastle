@@ -1,9 +1,12 @@
 import { PaginationQuery } from "#/@types/misc";
 import Audio, { AudioDocument } from "#/models/audio";
+import History from "#/models/history";
 import Playlist from "#/models/playlist";
 import User from "#/models/users";
 import { Request, Response } from "express";
-import { isValidObjectId, ObjectId } from "mongoose";
+import moment from "moment";
+import { isValidObjectId, ObjectId, PipelineStage } from "mongoose";
+import { PipelineCallback } from "stream";
 
 export async function updateFollower(req: Request, res: Response) {
   const { profileId } = req.params;
@@ -158,4 +161,83 @@ export async function getPublicPlaylists(req: Request, res: Response) {
       };
     }),
   });
+}
+
+export async function getRecommendedByProfile(req: Request, res: Response) {
+  const user = req.user;
+
+  let matchOptions: PipelineStage.Match = {
+    $match: { _id: { $exists: true } },
+  };
+
+  if (user) {
+    const usersPreviousHistory = await History.aggregate([
+      { $match: { owner: user.id } },
+
+      { $unwind: "$all" },
+
+      {
+        $match: {
+          "all.date": { $gte: moment().subtract(30, "days").toDate() },
+        },
+      },
+
+      { $group: { _id: "$all.audio" } },
+
+      {
+        $lookup: {
+          from: "audios",
+          localField: "_id",
+          foreignField: "_id",
+          as: "audioData",
+        },
+      },
+
+      { $unwind: "$audioData" },
+
+      { $group: { _id: null, category: { $addToSet: "$audioData.category" } } },
+    ]);
+
+    const categories = usersPreviousHistory[0]?.category;
+
+    if (categories.length) {
+      matchOptions = {
+        $match: { category: { $in: categories } },
+      };
+    }
+  }
+
+  const audios = await Audio.aggregate([
+    matchOptions,
+
+    { $sort: { "likes.count": -1 } },
+
+    { $limit: 10 },
+
+    {
+      $lookup: {
+        from: "users",
+        localField: "owner",
+        foreignField: "_id",
+        as: "owner",
+      },
+    },
+
+    { $unwind: "$owner" },
+
+    {
+      $project: {
+        _id: 0,
+        id: "$_id",
+        title: "$title",
+        category: "$category",
+        about: "$about",
+        file: "$file.url",
+        poster: "$poster.url",
+        owner: { name: "$owner.name", id: "$owner._id" },
+      },
+    },
+  ]);
+
+  res.status(200).json({ audios });
 }
