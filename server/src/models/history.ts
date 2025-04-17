@@ -28,23 +28,23 @@ const historySchema = new Schema<HistoryDocument>(
         type: Date,
         required: true,
       },
-
-      all: [
-        {
-          audio: {
-            type: Schema.Types.ObjectId,
-            ref: "Audio",
-          },
-
-          progress: Number,
-
-          date: {
-            type: Date,
-            required: true,
-          },
-        },
-      ],
     },
+
+    all: [
+      {
+        audio: {
+          type: Schema.Types.ObjectId,
+          ref: "Audio",
+        },
+
+        progress: Number,
+
+        date: {
+          type: Date,
+          required: true,
+        },
+      },
+    ],
   },
   { timestamps: true }
 );

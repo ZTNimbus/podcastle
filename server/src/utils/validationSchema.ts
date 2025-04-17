@@ -115,7 +115,7 @@ export const UpdateHistorySchema = yup.object().shape({
     })
     .required("Invalid audio id"),
 
-  proress: yup.number().required("Progress is required"),
+  progress: yup.number().required("Progress is required"),
 
   date: yup
     .string()
