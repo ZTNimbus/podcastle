@@ -8,6 +8,7 @@ import playlistRouter from "./routers/playlist";
 import profileRouter from "./routers/profile";
 import historyRouter from "./routers/history";
 import { PORT } from "./utils/variables";
+import "./utils/schedule";
 
 const app = express();
 

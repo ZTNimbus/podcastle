@@ -7,7 +7,7 @@ import { isAuth, isVerified } from "#/middleware/auth";
 import fileParser from "#/middleware/fileParser";
 import { validate } from "#/middleware/validator";
 import { AudioValidationSchema } from "#/utils/validationSchema";
-import express, { Application, RequestHandler } from "express";
+import express, { RequestHandler } from "express";
 
 const router = express.Router();
 
