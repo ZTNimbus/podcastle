@@ -1,9 +1,9 @@
-import { PopulatedFavoriteList } from "./../@types/audio";
 import { CreatePlaylistRequest, UpdatePlaylistRequest } from "#/@types/audio";
 import Audio from "#/models/audio";
 import Playlist from "#/models/playlist";
 import { Request, Response } from "express";
-import { isValidObjectId, ObjectId, Types } from "mongoose";
+import { isValidObjectId } from "mongoose";
+import { PopulatedFavoriteList } from "./../@types/audio";
 
 export async function createPlaylist(
   req: CreatePlaylistRequest,

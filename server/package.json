@@ -16,6 +16,7 @@
     "cloudinary": "^2.6.0",
     "dotenv": "^16.4.7",
     "express": "^5.1.0",
+    "express-async-handler": "^1.2.0",
     "formidable": "^3.5.2",
     "jsonwebtoken": "^9.0.2",
     "mailtrap": "^4.0.0",

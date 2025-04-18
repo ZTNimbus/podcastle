@@ -19,6 +19,11 @@ import formidable from "formidable";
 export async function signup(req: CreateUserRequest, res: Response) {
   const { email, password, name } = req.body;
 
+  const isExistingUser = await User.findOne({ email });
+
+  if (isExistingUser)
+    return res.status(409).json({ error: "This email is already registered" });
+
   const user = await User.create({ email, password, name });
 
   const token = generateToken();
@@ -74,6 +79,9 @@ export async function sendVerificationToken(req: Request, res: Response) {
   const user = await User.findById(userId);
 
   if (!user) return res.status(403).json({ error: "User not found" });
+
+  if (user.verified)
+    return res.status(422).json({ error: "User already verified" });
 
   sendVerificationMail(newToken, {
     name: user.name,

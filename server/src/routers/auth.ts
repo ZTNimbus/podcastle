@@ -24,7 +24,7 @@ import express, { Application, RequestHandler } from "express";
 const router = express.Router();
 
 validate(CreateUserSchema).then((validationMiddleware) => {
-  router.post("/signup", validationMiddleware, signup);
+  router.post("/signup", validationMiddleware, signup as RequestHandler);
 });
 
 validate(TokenAndIdVerification).then((validationMiddleware) => {
